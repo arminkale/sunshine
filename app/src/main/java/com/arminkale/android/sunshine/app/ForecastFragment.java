@@ -1,6 +1,11 @@
 package com.arminkale.android.sunshine.app;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -8,6 +13,8 @@ import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.util.Log;
@@ -15,6 +22,8 @@ import android.os.AsyncTask;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import java.util.*;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -44,7 +53,7 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Add this line in order to for this fragmanet to handle menu events.
+        //Add this line in order to for this fragment to handle menu events.
         setHasOptionsMenu(true);
     }
 
@@ -60,11 +69,11 @@ public class ForecastFragment extends Fragment {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("27410");
+
+        if (id == R.id.action_settings) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -73,39 +82,63 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        //Add sample data array
-        String[] forecastArray = {
-                "Today - Sunny - 70/55",
-                "Tomorrow - Mostly Cloudy - 75/52",
-                "Monday - Cloudy - 59/54",
-                "Tuesday - Rainy - 59/54",
-                "Wednesday - Rainy - 66/59",
-                "Thursday - Windy - 70/45",
-                "Friday - Sunny - 64/39",
-                "Saturday - Snow - 32/20",
-                "Sunday - Sleet - 38/29",
-                "Monday - Rain - 45/36"
-        };
+//        //Add sample data array
+//        String[] forecastArray = {
+//                "Today - Sunny - 70/55",
+//                "Tomorrow - Mostly Cloudy - 75/52",
+//                "Monday - Cloudy - 59/54",
+//                "Tuesday - Rainy - 59/54",
+//                "Wednesday - Rainy - 66/59",
+//                "Thursday - Windy - 70/45",
+//                "Friday - Sunny - 64/39",
+//                "Saturday - Snow - 32/20",
+//                "Sunday - Sleet - 38/29",
+//                "Monday - Rain - 45/36"
+//        };
 
         //Create list of strings from array
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
+        //List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
 
         //Create array adapter with our text view
-        //ArrayAdapter<String> forecastArrayAdapter =
         mForecastAdapter =
                 new ArrayAdapter<String>(
                         getActivity(),
                         R.layout.list_item_forecast,
                         R.id.list_item_forecast_textview,
-                        weekForecast);
+                        new ArrayList<String>());
 
         //Find list view
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         //Set the array adapter as the list view adapter
-        //listView.setAdapter(forecastArrayAdapter);
         listView.setAdapter(mForecastAdapter);
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String forecast = mForecastAdapter.getItem(position);
+
+                // Executed in an Activity, so 'this' is the Context
+                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
+                Intent detailIntent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(detailIntent);
+            }
+        });
 
         return rootView;
+    }
+
+    private void UpdateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        UpdateWeather();
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
@@ -126,6 +159,23 @@ public class ForecastFragment extends Fragment {
          * Prepare the weather high/lows for presentation.
          */
         private String formatHighLows(double high, double low) {
+            // Data is fetched in Celcius by default.
+            // If user prefers to see in Fahrenheit, convert the values here.
+            // We do this rather than fetching in Fahrenheit so that the user can
+            // change this option without us having to re-fetch the data once
+            // we start storing the values in a database.
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPrefs.getString(
+                    getString(R.string.pref_tempUnits_key),
+                    getString(R.string.pref_tempUnits_metric));
+
+            if (unitType.equals(getString(R.string.pref_tempUnits_imperial))){
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            } else if (!unitType.equals(getString(R.string.pref_tempUnits_metric))){
+                Log.d(LOG_TAG, "Unit type not found: " + unitType);
+            }
+
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
@@ -206,6 +256,7 @@ public class ForecastFragment extends Fragment {
 //                Log.v(LOG_TAG, "Forecast entry: " + s);
 //            }
 
+
             return resultStrs;
         }
 
@@ -234,7 +285,6 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
 
-                //URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=27410&mode=json&units=metric&cnt=7&appid=a7fd3a7103fb440d44cbcc8b10577a58");
                 final String FORECAST_BASE_URL =
                         "http://api.openweathermap.org/data/2.5/forecast/daily?";
                 final String QUERY_PARAM = "q";
@@ -248,8 +298,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(FORMAT_PARAM, format)
                         .appendQueryParameter(UNITS_PARAM, units)
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
-                        //.appendQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
-                        .appendQueryParameter(APPID_PARAM, "a7fd3a7103fb440d44cbcc8b10577a58")
+                        .appendQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
                         .build();
 
                 URL url = new URL(builtUri.toString());

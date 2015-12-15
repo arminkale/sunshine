@@ -1,5 +1,35 @@
 <resources>
     <string name="app_name">Sunshine</string>
     <string name="action_settings">Settings</string>
-    <string name="action_refresh" translatable="false">Refresh</string>
+    <string name="action_map">Map Location</string>
+    <string name="action_share">Share</string>
+    <string name="title_activity_detail">Detail Activity</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_header_general">General</string>
+
+    <!-- Location Preference -->
+    <string name="pref_location_title">Location</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_default" translatable="false">27410</string>
+
+    <!-- Temparature Units Preference -->
+    <string name="pref_tempUnits_title">Temperature Units</string>
+    <string name="pref_tempUnits_key" translatable="false">tempUnits</string>
+    <string name="pref_tempUnits_metric" translatable="false">metric</string>
+    <string name="pref_tempUnits_imperial" translatable="false">imperial</string>
+    <string name="pref_tempUnits_label_metric" translatable="false">Metric</string>
+    <string name="pref_tempUnits_label_imperial" translatable="false">Imperial</string>
+
+    <string-array name="pref_tempUnits_list_titles">
+        <item>@string/pref_tempUnits_label_metric</item>
+        <item>@string/pref_tempUnits_label_imperial</item>
+    </string-array>
+    <string-array name="pref_tempUnits_list_values">
+        <item>@string/pref_tempUnits_metric</item>
+        <item>@string/pref_tempUnits_imperial</item>
+    </string-array>
+
+    <string name="pref_ringtone_silent">Silent</string>
 </resources>

@@ -15,20 +15,20 @@
     <string name="pref_location_default" translatable="false">27410</string>
 
     <!-- Temparature Units Preference -->
-    <string name="pref_tempUnits_title">Temperature Units</string>
-    <string name="pref_tempUnits_key" translatable="false">tempUnits</string>
-    <string name="pref_tempUnits_metric" translatable="false">metric</string>
-    <string name="pref_tempUnits_imperial" translatable="false">imperial</string>
-    <string name="pref_tempUnits_label_metric" translatable="false">Metric</string>
-    <string name="pref_tempUnits_label_imperial" translatable="false">Imperial</string>
+    <string name="pref_units_title">Temperature Units</string>
+    <string name="pref_units_key" translatable="false">tempUnits</string>
+    <string name="pref_units_metric" translatable="false">metric</string>
+    <string name="pref_units_imperial" translatable="false">imperial</string>
+    <string name="pref_units_label_metric" translatable="false">Metric</string>
+    <string name="pref_units_label_imperial" translatable="false">Imperial</string>
 
-    <string-array name="pref_tempUnits_list_titles">
-        <item>@string/pref_tempUnits_label_metric</item>
-        <item>@string/pref_tempUnits_label_imperial</item>
+    <string-array name="pref_units_list_titles">
+        <item>@string/pref_units_label_metric</item>
+        <item>@string/pref_units_label_imperial</item>
     </string-array>
-    <string-array name="pref_tempUnits_list_values">
-        <item>@string/pref_tempUnits_metric</item>
-        <item>@string/pref_tempUnits_imperial</item>
+    <string-array name="pref_units_list_values">
+        <item>@string/pref_units_metric</item>
+        <item>@string/pref_units_imperial</item>
     </string-array>
 
     <string name="pref_ringtone_silent">Silent</string>

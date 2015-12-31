@@ -3,9 +3,13 @@ package com.arminkale.android.sunshine.app;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.view.LayoutInflater;
@@ -22,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.arminkale.android.sunshine.app.data.WeatherContract;
+import com.arminkale.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -39,9 +44,9 @@ import org.json.JSONException;
 /**
  * A fragment containing a simple view.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    //private ArrayAdapter<String> mForecastAdapter = null;
+    private static final int FORECAST_LOADER = 0;
     private ForecastAdapter mForecastAdapter = null;
 
     public ForecastFragment() {
@@ -77,23 +82,8 @@ public class ForecastFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        String locationSetting = Utility.getPreferredLocation(getActivity());
-
-        // Create the sortOrder: Ascending, by date, for the cursor.
-        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-                locationSetting, System.currentTimeMillis()
-        );
-
-        // Create the cursor.
-        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
-                null,
-                null,
-                null,
-                sortOrder);
-
-        // Instantiate the forecast adapter.
-        mForecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
+        // The CursorAdapter will take data from our cursor and populate the ListView.
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -105,6 +95,12 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
     private void UpdateWeather() {
         FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
@@ -112,11 +108,38 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         UpdateWeather();
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order: ascending by date
+        String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+        return new CursorLoader(getActivity(),
+                weatherForLocationUri,
+                null,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mForecastAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
+    }
+}
     // 2015-12-22 Lesson 4B: Content Providers
     // Commented out in Step 4.14 Refactoring FatchWeatherTask (to use provided
     // class in FetchWeatherTask.java file.)
@@ -351,4 +374,4 @@ public class ForecastFragment extends Fragment {
 //            }
 //        }
 //    }
-}
+//}

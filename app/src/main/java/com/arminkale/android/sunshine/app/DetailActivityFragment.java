@@ -1,7 +1,10 @@
 package com.arminkale.android.sunshine.app;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.os.Bundle;
@@ -36,8 +39,8 @@ public class DetailActivityFragment extends Fragment {
         //Log.v("DetailActivityFragment", "2");
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         //Log.v("DetailActivityFragment", "3");
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            mForecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (intent != null) {
+            mForecastStr = intent.getDataString();
         }
 
         if (mForecastStr != null) {

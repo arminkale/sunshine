@@ -36,12 +36,15 @@ public class DetailActivityFragment extends Fragment {
         //Log.v("DetailActivityFragment", "2");
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         //Log.v("DetailActivityFragment", "3");
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)){
+        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             mForecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
-            //Log.v("Forecast2", mForecastStr);
+        }
+
+        if (mForecastStr != null) {
             ((TextView) rootView.findViewById(R.id.detail_text)).setText(mForecastStr);
             //Log.v("DetailActivityFragment", "4");
         }
+
         //Log.v("DetailActivityFragment", "5");
         return rootView;
     }

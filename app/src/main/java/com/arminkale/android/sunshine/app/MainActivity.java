@@ -19,12 +19,24 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final String FORECASTFRAGMENT_TAG = "FFTAG";
+
+    private String mLocation;
 
     protected void onCreate(Bundle savedInstanceState) {
+        mLocation = Utility.getPreferredLocation(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // 2015-12-30: Lesson 4C: Handle the Settings Change
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+////                    .add(R.id.container, new ForecastFragment())
+//                    .add(R.id.fragment_main, new ForecastFragment(), FORECASTFRAGMENT_TAG)
+//                    .commit();
+//        }
     }
 
     @Override
@@ -71,6 +83,22 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             Log.d(LOG_TAG, "Couldn't call " + location + ", no receiving apps installed!");
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String location = Utility.getPreferredLocation( this );
+        // update the location in our second pane using the fragment manager
+        if (location != null && !location.equals(mLocation)) {
+            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().
+//                    findFragmentByTag(FORECASTFRAGMENT_TAG);
+                      findFragmentById(R.id.fragment_main);
+            if ( null != ff ) {
+                ff.onLocationChanged();
+            }
+            mLocation = location;
         }
     }
 }

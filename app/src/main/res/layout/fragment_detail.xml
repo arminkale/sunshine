@@ -31,7 +31,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:id="@+id/detail_high_textview"
@@ -56,12 +57,10 @@
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
 
-                <!--TODO: Change width and height to wrap_content once images are added.-->
                 <ImageView
                     android:id="@+id/detail_icon"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:src="@drawable/ic_launcher"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/detail_forecast_textview"

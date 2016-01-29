@@ -9,12 +9,10 @@
               android:orientation="horizontal"
               android:padding="16dp">
 
-    <!-- NOTE: Set layout_width and layout_height to wrap_content when using provided images. -->
     <ImageView
         android:id="@+id/list_item_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_launcher"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:layout_height="wrap_content"
